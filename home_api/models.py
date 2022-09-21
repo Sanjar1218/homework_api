@@ -1,9 +1,14 @@
 from django.db import models
 
 class User(models.Model):
-    full_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=100)
     username = models.CharField(max_length=100)
     phone = models.DecimalField(max_digits=9, decimal_places=0)
+    
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
     
     def __str__(self):
         return self.username
