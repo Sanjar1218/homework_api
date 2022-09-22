@@ -31,6 +31,6 @@ class Task(models.Model):
         return str(self.data)
 
 class Check(models.Model):
-    date = models.DateField(auto_now_add=True)
+    date = models.DateField()
     student = models.ForeignKey(User, on_delete=models.CASCADE)
     isHere = models.BooleanField(default=False)
