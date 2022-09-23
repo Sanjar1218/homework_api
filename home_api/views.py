@@ -30,29 +30,25 @@ def davomat(reqeust):
     data = reqeust.data
     if reqeust.method == 'POST':
         for i in data:
-            date = datetime.datetime.strptime(i.get('date'), '%d-%m-%y')
+            date = datetime.datetime.strptime(i.get('date'), '%d-%m-%y').date()
             user = User.objects.get(username=i.get('username'))
             if Check.objects.filter(student=user, date=date).exists():
                 c = Check.objects.get(student=user, date=date)
                 c.isHere = i.get('ishere')
             else:
                 c = Check(student=user, isHere=i.get('ishere'), date=date)
-                
             c.save()
         return Response({'status': 'completed'}, status=status.HTTP_202_ACCEPTED)
     # Returns all user davomat todays
-    users = User.objects.all()
-    
+    users = Groups.objects.get(group=data.get('group')).user_set.all()
     lst = []
     for user in users:
         dct = {}
-        print(user)
-        for i in data:
-            date = datetime.datetime.strptime(i.get('date'), '%d-%m-%y')
-            if user.check_set.filter(date=date).exists():
-                isHere = user.check_set.get(date=date).isHere
-                dct['full_name'] = user.full_name
-                dct['ishere'] = isHere
-                lst.append(dct)
+        date = datetime.datetime.strptime(data.get('date'), '%d-%m-%y')
+        if user.check_set.filter(date=date).exists():
+            isHere = user.check_set.get(date=date).isHere
+            dct['full_name'] = user.full_name
+            dct['ishere'] = isHere
+            lst.append(dct)
     return Response({'status': 'good', 'data': lst}, status=status.HTTP_200_OK)
     
