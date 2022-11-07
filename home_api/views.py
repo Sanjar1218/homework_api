@@ -24,9 +24,9 @@ def homework(request):
     for task in tasks:
         t, c = base.task.get_or_create(name=task.get('name'))
         # if not created it's gonna updateds attempt and isSolved attributes
+        t.isSolved = task.get('isSolved')
         if not c:
             t.attempt +=1
-            t.isSolved = task.get('isSolved')
             t.save()
     return Response({'status':'ok'}, status=status.HTTP_200_OK)
 
