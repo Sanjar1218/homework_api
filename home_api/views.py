@@ -1,7 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .models import User, Check, Task, Groups
+from django.contrib.auth.models import User, Group
+from .models import Check, Task, HomeWork
 import datetime
 
 @api_view(['get'])
@@ -9,17 +10,39 @@ def echo(request):
     return Response({'status': 'ok'})
 
 @api_view(['post'])
+def homework(request):
+    # getting data from reqeust
+    data = request.data 
+    github = data.get('github')
+    repo = data.get('repo')
+    tasks = data.get('tasks')
+
+    user = User.objects.get(username=github)
+    # it doesn't matter created or not
+    base, created = HomeWork.objects.get_or_create(name=repo, user=user)
+    for task in tasks:
+        t, c = base.task.get_or_create(name=task.get('name'))
+        # if not created it's gonna updateds attempt and isSolved attributes
+        if not c:
+            t.attempt +=1
+            t.isSolved = task.get('isSolved')
+            t.save()
+    return Response({'status':'ok'}, status=status.HTTP_200_OK)
+
+
+@api_view(['post'])
 def createUser(request):
     data = request.data
     
     if User.objects.filter(username=data.get('username')).exists():
         return Response({'status':'User exists'}, status=status.HTTP_208_ALREADY_REPORTED)
-    group = Groups.objects.get_or_create(group=data.get('group'))[0]
+    
+    group, created = Group.objects.get_or_create(name=data.get('group'))
     user = User(
         first_name = data.get('first_name'),
         last_name  = data.get('last_name'),
         username   = data.get('username'),
-        phone      = data.get('phone', 1234),
+        phone      = data.get('phone'),
         group      = group
     )
     user.save()
@@ -40,7 +63,9 @@ def davomat(reqeust):
             c.save()
         return Response({'status': 'completed'}, status=status.HTTP_202_ACCEPTED)
     # Returns all user davomat todays
-    users = Groups.objects.get(group=data.get('group')).user_set.all()
+    data = reqeust.headers
+    print(data)
+    users = Group.objects.get(group=data.get('group')).user_set.all()
     lst = []
     for user in users:
         dct = {}
