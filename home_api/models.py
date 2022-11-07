@@ -11,8 +11,8 @@ class HomeWork(models.Model):
 class Task(models.Model):
     homework = models.ForeignKey(HomeWork, on_delete=models.CASCADE, related_name='task')
     name = models.CharField(max_length=255)
-    attempt = models.IntegerField(default=1)
     isSolved = models.BooleanField(default=False)
+    created = models.DateTimeField(auto_now_add=True)
     
     def __str__(self) -> str:
         return str(self.name)

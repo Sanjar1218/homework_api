@@ -22,12 +22,7 @@ def homework(request):
     # it doesn't matter homework created or not
     base, created = HomeWork.objects.get_or_create(name=repo, user=user)
     for task in tasks:
-        t, c = base.task.get_or_create(name=task.get('name'))
-        # if not created it's gonna updateds attempt and isSolved attributes
-        t.isSolved = task.get('isSolved')
-        if not c:
-            t.attempt +=1
-            t.save()
+        t = base.task.create(name=task.get('name'), isSolved=task.get('isSolved'))
     return Response({'status':'ok'}, status=status.HTTP_200_OK)
 
 
