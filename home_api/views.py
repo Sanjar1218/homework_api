@@ -11,6 +11,7 @@ def echo(request):
 
 @api_view(['post'])
 def homework(request):
+    # in the future we gonna change this to serializers
     # getting data from reqeust
     data = request.data 
     github = data.get('github')
@@ -18,7 +19,7 @@ def homework(request):
     tasks = data.get('tasks')
 
     user = User.objects.get(username=github)
-    # it doesn't matter created or not
+    # it doesn't matter homework created or not
     base, created = HomeWork.objects.get_or_create(name=repo, user=user)
     for task in tasks:
         t, c = base.task.get_or_create(name=task.get('name'))
